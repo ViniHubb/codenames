@@ -28,8 +28,8 @@
         <div class="group">
             <span class="group-label">Função</span>
             <div class="options">
-                <button class="opt" data-group="role" data-value="SPYMASTER">Espião Mestre</button>
-                <button class="opt" data-group="role" data-value="AGENT">Agente</button>
+                <button class="opt" data-group="role" data-value="SPYMASTER" disabled>Espião Mestre</button>
+                <button class="opt" data-group="role" data-value="AGENT" disabled>Agente</button>
             </div>
         </div>
 
@@ -40,21 +40,24 @@
     <!-- Game board -->
     <section id="game" class="game hidden">
         <header id="topbar">
+            <button id="backBtn" class="ctrl hidden" type="button" title="Voltar" aria-label="Voltar">
+                <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </button>
             <div id="banner" class="banner"></div>
-            <div class="counts">
-                <span class="count red"><span id="redCount">0</span></span>
-                <span class="count blue"><span id="blueCount">0</span></span>
+            <span class="count red"><span id="redCount">0</span></span>
+            <span class="count blue"><span id="blueCount">0</span></span>
+            <span class="spacer"></span>
+            <div id="hostControls" class="host-controls hidden">
+                <button id="passTurn" class="ctrl" type="button" title="Passar turno" aria-label="Passar turno">
+                    <svg viewBox="0 0 24 24"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+                </button>
+                <button id="newGame" class="ctrl" type="button" title="Nova partida" aria-label="Nova partida">
+                    <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                </button>
             </div>
         </header>
 
         <div id="board" class="board"></div>
-
-        <footer id="hostControls" class="host-controls hidden">
-            <button id="passTurn" class="ctrl">Passar turno</button>
-            <button id="newGame" class="ctrl primary">Nova partida</button>
-        </footer>
-
-        <div id="conn" class="conn"></div>
     </section>
 
     <!-- Floating fullscreen toggle (browser players only) -->

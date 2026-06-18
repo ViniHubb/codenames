@@ -12,8 +12,8 @@
     const redCount = document.getElementById("redCount");
     const blueCount = document.getElementById("blueCount");
     const hostControls = document.getElementById("hostControls");
-    const conn = document.getElementById("conn");
     const fsBtn = document.getElementById("fsBtn");
+    const backBtn = document.getElementById("backBtn");
 
     let ws = null;
     let lastState = null;
@@ -23,18 +23,48 @@
 
     function wireLanding() {
         landing.classList.remove("hidden");
-        document.querySelectorAll(".opt").forEach((btn) => {
+        const teamBtns = document.querySelectorAll('.opt[data-group="team"]');
+        const roleBtns = document.querySelectorAll('.opt[data-group="role"]');
+        const enter = document.getElementById("enter");
+
+        function teamColor() {
+            if (selection.team === "RED") return "var(--red)";
+            if (selection.team === "BLUE") return "var(--blue)";
+            return "";
+        }
+        // The chosen role button is painted with the selected team's color.
+        function paintSelectedRole() {
+            roleBtns.forEach((b) => {
+                b.style.background = b.classList.contains("selected") ? teamColor() : "";
+            });
+        }
+        function refreshEnter() {
+            enter.disabled = !(selection.team && selection.role);
+        }
+
+        teamBtns.forEach((btn) => {
             btn.addEventListener("click", () => {
-                const g = btn.dataset.group;
-                selection[g] = btn.dataset.value;
-                document
-                    .querySelectorAll(`.opt[data-group="${g}"]`)
-                    .forEach((b) => b.classList.remove("selected"));
+                selection.team = btn.dataset.value;
+                teamBtns.forEach((b) => b.classList.remove("selected"));
                 btn.classList.add("selected");
-                document.getElementById("enter").disabled = !(selection.team && selection.role);
+                roleBtns.forEach((b) => { b.disabled = false; }); // unlock roles after a team
+                paintSelectedRole();
+                refreshEnter();
             });
         });
-        document.getElementById("enter").addEventListener("click", () => {
+
+        roleBtns.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                if (!selection.team) return; // can't pick a role before a team
+                selection.role = btn.dataset.value;
+                roleBtns.forEach((b) => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                paintSelectedRole();
+                refreshEnter();
+            });
+        });
+
+        enter.addEventListener("click", () => {
             team = selection.team;
             role = selection.role;
             requestFullscreen(); // this click is a user gesture, so the browser allows it
@@ -84,8 +114,13 @@
     function startGame() {
         landing.classList.add("hidden");
         game.classList.remove("hidden");
+        fitViewport();
         if (role === "HOST") {
             hostControls.classList.remove("hidden");
+            backBtn.classList.remove("hidden");
+            backBtn.addEventListener("click", () => {
+                if (window.AndroidHost && window.AndroidHost.back) window.AndroidHost.back();
+            });
             document.getElementById("passTurn").addEventListener("click", () =>
                 send({ action: "passTurn" })
             );
@@ -121,8 +156,19 @@
     }
 
     function setConn(text, isError) {
-        conn.textContent = text;
-        conn.classList.toggle("error", !!isError);
+        // Connection status is shown in the turn chip; a fresh state message overwrites it.
+        if (text) {
+            banner.textContent = text;
+            banner.className = "banner" + (isError ? " conn-error" : "");
+        }
+    }
+
+    // Some Android WebViews resolve CSS viewport/percentage heights unreliably, which leaves the
+    // grid stuck at a tiny height with empty space below. Pin the real height measured in JS so
+    // the board's flex:1 has a concrete height to fill. Recompute on resize/rotation.
+    function fitViewport() {
+        const h = window.innerHeight || document.documentElement.clientHeight;
+        if (h) game.style.height = h + "px";
     }
 
     // ---------- Rendering ----------
@@ -182,6 +228,10 @@
     }
 
     // ---------- Boot ----------
+    fitViewport();
+    window.addEventListener("resize", fitViewport);
+    window.addEventListener("orientationchange", () => setTimeout(fitViewport, 150));
+
     // Fullscreen toggle is for browser players only; the host runs inside the app's WebView.
     if (role === "HOST") {
         fsBtn.classList.add("hidden");

@@ -5,30 +5,25 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
+import android.os.Handler
+import android.os.Looper
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.codenames.host.server.GameServer
 
 /**
  * In-app host control board. Reuses the same web client served to players, but with role=host,
- * which enables tap-to-reveal. Loads over loopback so it never leaves the device.
+ * which enables tap-to-reveal. Loads over loopback so it never leaves the device. The web UI
+ * draws its own back button (top-left) and calls back into [onBack] through [WebBridge].
  */
 @Composable
 fun HostBoardScreen(onBack: () -> Unit) {
@@ -47,30 +42,30 @@ fun HostBoardScreen(onBack: () -> Unit) {
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            TextButton(onClick = onBack) { Text("← Voltar") }
-            Text("Tabuleiro (Host)", style = MaterialTheme.typography.titleMedium)
-        }
-
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { context ->
-                @SuppressLint("SetJavaScriptEnabled")
-                WebView(context).apply {
-                    settings.javaScriptEnabled = true
-                    settings.domStorageEnabled = true
-                    webViewClient = WebViewClient()
-                    loadUrl("http://127.0.0.1:${GameServer.DEFAULT_PORT}/?role=host")
-                }
+    AndroidView(
+        modifier = Modifier.fillMaxSize(),
+        factory = { ctx ->
+            @SuppressLint("SetJavaScriptEnabled")
+            WebView(ctx).apply {
+                settings.javaScriptEnabled = true
+                settings.domStorageEnabled = true
+                webViewClient = WebViewClient()
+                // Required so JS dialogs (e.g. the "Nova partida?" confirm) actually appear.
+                webChromeClient = WebChromeClient()
+                // Lets the web back button trigger the native navigation.
+                addJavascriptInterface(WebBridge(onBack), "AndroidHost")
+                loadUrl("http://127.0.0.1:${GameServer.DEFAULT_PORT}/?role=host")
             }
-        )
+        }
+    )
+}
+
+/** Bridge exposed to the host web page as `AndroidHost`. */
+private class WebBridge(private val onBack: () -> Unit) {
+    @JavascriptInterface
+    fun back() {
+        // JS interface calls arrive on a binder thread; hop to the main thread for Compose.
+        Handler(Looper.getMainLooper()).post(onBack)
     }
 }
 
