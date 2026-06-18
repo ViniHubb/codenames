@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Codenames</string>
+    <string name="notif_channel_name">Servidor Codenames</string>
+    <string name="notif_title">Codenames em execução</string>
+    <string name="notif_text">Servidor ativo — jogadores podem conectar.</string>
+</resources>

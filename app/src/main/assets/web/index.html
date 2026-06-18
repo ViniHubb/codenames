@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="theme-color" content="#1A1B26" />
+    <title>Codenames</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <!-- Landing: pick team + role (skipped when ?role=host) -->
+    <section id="landing" class="landing hidden">
+        <h1>Codenames</h1>
+        <p class="subtitle">Escolha seu time e sua função</p>
+
+        <div class="group">
+            <span class="group-label">Time</span>
+            <div class="options">
+                <button class="opt team-red" data-group="team" data-value="RED">Vermelho</button>
+                <button class="opt team-blue" data-group="team" data-value="BLUE">Azul</button>
+            </div>
+        </div>
+
+        <div class="group">
+            <span class="group-label">Função</span>
+            <div class="options">
+                <button class="opt" data-group="role" data-value="SPYMASTER">Espião Mestre</button>
+                <button class="opt" data-group="role" data-value="AGENT">Agente</button>
+            </div>
+        </div>
+
+        <button id="enter" class="enter" disabled>Entrar</button>
+        <p class="hint">O Espião Mestre vê o mapa de cores. O Agente vê apenas as palavras.</p>
+    </section>
+
+    <!-- Game board -->
+    <section id="game" class="game hidden">
+        <header id="topbar">
+            <div id="banner" class="banner"></div>
+            <div class="counts">
+                <span class="count red"><span id="redCount">0</span></span>
+                <span class="count blue"><span id="blueCount">0</span></span>
+            </div>
+        </header>
+
+        <div id="board" class="board"></div>
+
+        <footer id="hostControls" class="host-controls hidden">
+            <button id="passTurn" class="ctrl">Passar turno</button>
+            <button id="newGame" class="ctrl primary">Nova partida</button>
+        </footer>
+
+        <div id="conn" class="conn"></div>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>
