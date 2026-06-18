@@ -1,6 +1,10 @@
 package com.codenames.host.ui
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.pm.ActivityInfo
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
@@ -14,8 +18,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.codenames.host.server.GameServer
@@ -27,6 +33,19 @@ import com.codenames.host.server.GameServer
 @Composable
 fun HostBoardScreen(onBack: () -> Unit) {
     BackHandler(onBack = onBack)
+
+    // The board is much more readable in landscape (5x5 grid of words). Force landscape while
+    // this screen is shown and restore the previous orientation when leaving.
+    val context = LocalContext.current
+    DisposableEffect(Unit) {
+        val activity = context.findActivity()
+        val previous = activity?.requestedOrientation
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        onDispose {
+            activity?.requestedOrientation =
+                previous ?: ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -53,4 +72,14 @@ fun HostBoardScreen(onBack: () -> Unit) {
             }
         )
     }
+}
+
+/** Unwraps the Activity from a (possibly wrapped) Compose Context. */
+private fun Context.findActivity(): Activity? {
+    var ctx: Context? = this
+    while (ctx is ContextWrapper) {
+        if (ctx is Activity) return ctx
+        ctx = ctx.baseContext
+    }
+    return null
 }

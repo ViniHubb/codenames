@@ -13,6 +13,7 @@
     const blueCount = document.getElementById("blueCount");
     const hostControls = document.getElementById("hostControls");
     const conn = document.getElementById("conn");
+    const fsBtn = document.getElementById("fsBtn");
 
     let ws = null;
     let lastState = null;
@@ -36,8 +37,47 @@
         document.getElementById("enter").addEventListener("click", () => {
             team = selection.team;
             role = selection.role;
+            requestFullscreen(); // this click is a user gesture, so the browser allows it
             startGame();
         });
+    }
+
+    // ---------- Fullscreen ----------
+    function isFullscreen() {
+        return !!(document.fullscreenElement || document.webkitFullscreenElement);
+    }
+
+    function requestFullscreen() {
+        const el = document.documentElement;
+        const req = el.requestFullscreen || el.webkitRequestFullscreen;
+        if (req) {
+            try {
+                Promise.resolve(req.call(el)).catch(() => {});
+            } catch (e) {
+                /* not supported (e.g. iOS Safari) */
+            }
+        }
+    }
+
+    function exitFullscreen() {
+        const exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exit) {
+            try {
+                Promise.resolve(exit.call(document)).catch(() => {});
+            } catch (e) {
+                /* ignore */
+            }
+        }
+    }
+
+    function toggleFullscreen() {
+        if (isFullscreen()) exitFullscreen();
+        else requestFullscreen();
+    }
+
+    function updateFsIcon() {
+        fsBtn.textContent = isFullscreen() ? "✕" : "⛶";
+        fsBtn.title = isFullscreen() ? "Sair da tela cheia" : "Tela cheia";
     }
 
     // ---------- Game ----------
@@ -142,6 +182,15 @@
     }
 
     // ---------- Boot ----------
+    // Fullscreen toggle is for browser players only; the host runs inside the app's WebView.
+    if (role === "HOST") {
+        fsBtn.classList.add("hidden");
+    } else {
+        fsBtn.addEventListener("click", toggleFullscreen);
+        document.addEventListener("fullscreenchange", updateFsIcon);
+        document.addEventListener("webkitfullscreenchange", updateFsIcon);
+    }
+
     if (role === "HOST" || role === "SPYMASTER" || role === "AGENT") {
         // Role given via URL (e.g. host WebView): skip landing.
         if (!team) team = "RED";
