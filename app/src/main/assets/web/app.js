@@ -183,10 +183,10 @@
     function renderBanner(state) {
         banner.className = "banner";
         if (state.status === "RED_WINS") {
-            banner.textContent = "🏆 Time Vermelho venceu!";
+            banner.textContent = "🏆 Vermelho venceu!";
             banner.classList.add("win-red");
         } else if (state.status === "BLUE_WINS") {
-            banner.textContent = "🏆 Time Azul venceu!";
+            banner.textContent = "🏆 Azul venceu!";
             banner.classList.add("win-blue");
         } else {
             const t = state.currentTurn === "RED" ? "Vermelho" : "Azul";

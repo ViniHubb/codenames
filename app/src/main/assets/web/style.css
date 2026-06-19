@@ -7,8 +7,8 @@
     --red-dim: #5e2722;
     --blue: #2471a3;
     --blue-dim: #1d3a4f;
-    --neutral: #c8b18b;
-    --neutral-dim: #5a513f;
+    --neutral: #c9ccd6;
+    --neutral-dim: #4a4d59;
     --assassin: #15151c;
     --card: #2f3350;
 }
@@ -87,6 +87,8 @@ html, body {
 }
 .spacer { flex: 1 1 auto; }
 .banner {
+    flex: none;
+    width: 170px; /* fixed so it doesn't resize when the turn switches red <-> blue */
     height: 40px;
     line-height: 40px;
     font-weight: 600;
@@ -94,10 +96,10 @@ html, body {
     padding: 0 12px;
     border-radius: 8px;
     background: var(--panel);
+    text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 42vw;
 }
 .banner.turn-red { background: var(--red); }
 .banner.turn-blue { background: var(--blue); }
