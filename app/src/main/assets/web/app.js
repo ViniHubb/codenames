@@ -114,6 +114,9 @@
     function startGame() {
         landing.classList.add("hidden");
         game.classList.remove("hidden");
+        // HOST/SPYMASTER see the full map; AGENT only sees revealed cards. This drives the
+        // contrast scheme (see style.css): map = vibrant until marked, agent = vibrant once marked.
+        document.body.classList.add(role === "AGENT" ? "agent-view" : "map-view");
         fitViewport();
         if (role === "HOST") {
             hostControls.classList.remove("hidden");
@@ -204,27 +207,61 @@
             board.innerHTML = "";
             state.cards.forEach((_, i) => {
                 const el = document.createElement("div");
+                el.className = "card";
                 el.dataset.index = i;
-                el.addEventListener("click", () => {
-                    const idx = Number(el.dataset.index);
-                    const card = lastState && lastState.cards[idx];
-                    if (lastState && lastState.canReveal && lastState.status === "PLAYING" && card && !card.revealed) {
-                        send({ action: "reveal", index: idx });
-                    }
-                });
+                el.innerHTML = '<span class="fill"></span><span class="word"></span>';
+                // Revealing requires a long press (anti-misclick) — see startHold/cancelHold.
+                el.addEventListener("pointerdown", (e) => onPress(e, el));
+                el.addEventListener("pointerup", () => cancelHold(el));
+                el.addEventListener("pointerleave", () => cancelHold(el));
+                el.addEventListener("pointercancel", () => cancelHold(el));
+                el.addEventListener("contextmenu", (e) => e.preventDefault());
                 board.appendChild(el);
             });
         }
 
         state.cards.forEach((card, i) => {
             const el = board.children[i];
-            el.textContent = card.word;
+            el.querySelector(".word").textContent = card.word;
             let cls = "card";
             if (card.color) cls += " " + card.color.toLowerCase();
             if (card.revealed) cls += " revealed";
             if (canTap && !card.revealed) cls += " tappable";
             el.className = cls;
         });
+    }
+
+    // ---------- Long-press to reveal (host, anti-misclick) ----------
+    // Duration comes from --hold-ms in style.css so the JS timer and the fill animation stay in sync.
+    const HOLD_MS =
+        parseInt(getComputedStyle(document.documentElement).getPropertyValue("--hold-ms")) || 2500;
+
+    function onPress(e, el) {
+        const idx = Number(el.dataset.index);
+        const card = lastState && lastState.cards[idx];
+        const eligible =
+            lastState && lastState.canReveal && lastState.status === "PLAYING" && card && !card.revealed;
+        if (!eligible) return;
+        e.preventDefault();
+        startHold(el, idx);
+    }
+
+    function startHold(el, idx) {
+        cancelHold(el);
+        el.classList.add("holding"); // triggers the CSS fill transition over --hold-ms
+        el._holdTimer = setTimeout(() => {
+            el.classList.remove("holding");
+            el._holdTimer = null;
+            send({ action: "reveal", index: idx });
+        }, HOLD_MS);
+    }
+
+    function cancelHold(el) {
+        if (el._holdTimer) {
+            clearTimeout(el._holdTimer);
+            el._holdTimer = null;
+        }
+        el.classList.remove("holding"); // resets the fill quickly
     }
 
     // ---------- Boot ----------

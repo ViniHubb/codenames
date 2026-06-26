@@ -2,15 +2,20 @@
     --bg: #1a1b26;
     --panel: #24263a;
     --text: #e6e7ee;
+    --text-dim: #9aa0b5;
     --muted: #9aa0b5;
     --red: #c0392b;
+    --dark-red: #8e1f1a;
     --red-dim: #5e2722;
     --blue: #2471a3;
+    --dark-blue: #1a4d6e;
     --blue-dim: #1d3a4f;
     --neutral: #c9ccd6;
+    --dark-neutral: #7a7e8c;
     --neutral-dim: #4a4d59;
     --assassin: #15151c;
     --card: #2f3350;
+    --hold-ms: 2000ms; /* how long the host holds a card to reveal it (kept in sync by app.js) */
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -146,23 +151,55 @@ html, body {
     user-select: none;
     border: 2px solid transparent;
     overflow: hidden;
+    position: relative;
+    -webkit-touch-callout: none;
 }
-/* Map view colors (host / spymaster) */
-.card.red { background: var(--red-dim); border-color: var(--red); }
-.card.blue { background: var(--blue-dim); border-color: var(--blue); }
-.card.neutral { background: var(--neutral-dim); border-color: var(--neutral); }
-.card.assassin { background: var(--assassin); border-color: #000; color: #c44; }
+.word {
+    position: relative;
+    z-index: 1;
+}
+/* Long-press feedback: a translucent sweep fills the card while it is held. */
+.fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: rgba(255, 255, 255, 0.32);
+    border-radius: inherit;
+    pointer-events: none;
+    transition: width 150ms ease; /* quick reset when released early */
+}
+.card.holding .fill {
+    width: 100%;
+    transition: width var(--hold-ms) linear; /* fills over the hold duration */
+}
+/* Vibrant tiles. In the MAP view (host/spymaster) these style the UNREVEALED cards — the ones
+   that still matter. In the AGENT view they style the revealed cards (the only colored ones). */
+.card.red,
+.agent-view .card.revealed.red { background: var(--red); border-color: var(--dark-red); color: var(--bg); }
+.card.blue,
+.agent-view .card.revealed.blue { background: var(--blue); border-color: var(--dark-blue); color: var(--bg); }
+.card.neutral,
+.agent-view .card.revealed.neutral { background: var(--neutral); border-color: var(--dark-neutral); color: var(--bg); }
+.card.assassin,
+.agent-view .card.revealed.assassin { background: #000; border-color: #ff5a4d; color: #ff5a4d; }
 
-/* Revealed cards: fully saturated, dimmed text */
-.card.revealed { opacity: .92; }
-.card.revealed.red { background: var(--red); border-color: #fff; }
-.card.revealed.blue { background: var(--blue); border-color: #fff; }
-.card.revealed.neutral { background: var(--neutral); color: #222; border-color: #fff; }
-.card.revealed.assassin { background: #000; color: #e74c3c; border-color: #e74c3c; }
+/* Agent view: a revealed card lifts to stand out from the blank tiles. */
+.agent-view .card.revealed {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12), 0 3px 10px rgba(0, 0, 0, 0.5);
+}
 
-/* Host-only: unrevealed cards are tappable */
-.card.tappable { cursor: pointer; }
-.card.tappable:active { transform: scale(0.96); }
+/* Map view: once a card is marked it matters less, so it recedes to a soft, muted tint. */
+.map-view .card.revealed.red { background: #4a302e; border-color: #6f433c; color: var(--text-dim); }
+.map-view .card.revealed.blue { background: #26384a; border-color: #3b5f7e; color: var(--text-dim); }
+.map-view .card.revealed.neutral { background: #474b58; border-color: #7a8090; color: var(--text-dim); }
+.map-view .card.revealed.assassin { background: #1d1d25; border-color: #45454e; color: #e0554c; }
+
+/* Host-only: unrevealed cards are tappable (long-press). touch-action:none keeps the press
+   stable (no scroll/zoom interfering with the hold). */
+.card.tappable { cursor: pointer; touch-action: none; }
+.card.tappable:active { transform: scale(0.97); }
 
 /* Standardized compact square buttons (host only). */
 .host-controls { display: flex; gap: 6px; }
