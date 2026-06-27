@@ -68,6 +68,7 @@
             team = selection.team;
             role = selection.role;
             requestFullscreen(); // this click is a user gesture, so the browser allows it
+            enableKeepAwake(); // keep the player's screen on (needs this gesture)
             startGame();
         });
     }
@@ -109,6 +110,28 @@
         fsBtn.textContent = isFullscreen() ? "✕" : "⛶";
         fsBtn.title = isFullscreen() ? "Sair da tela cheia" : "Tela cheia";
     }
+
+    // ---------- Keep awake (players) ----------
+    // Over plain http the Wake Lock API isn't available, so NoSleep.js falls back to a hidden
+    // looping video. It must be enabled from a user gesture (the "Entrar" tap).
+    let noSleep = null;
+    function enableKeepAwake() {
+        try {
+            if (!noSleep && typeof NoSleep !== "undefined") noSleep = new NoSleep();
+            if (noSleep) noSleep.enable();
+        } catch (e) {
+            /* not supported in this browser */
+        }
+    }
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && noSleep) {
+            try {
+                noSleep.enable();
+            } catch (e) {
+                /* ignore */
+            }
+        }
+    });
 
     // ---------- Game ----------
     function startGame() {
