@@ -44,6 +44,18 @@ Detalhes de UX:
   modo re-sorteia o tabuleiro com o novo tema de palavras.
 - Cores do mapa: vermelho, azul, **cinza** (neutra) e preto (assassino).
 
+## Instalar sem PC (via Releases)
+A cada push na `main`, o GitHub Actions compila um **APK de debug** e o publica na release
+**latest** — dá pra instalar em qualquer celular Android só com internet:
+1. Abra **[Releases](https://github.com/ViniHubb/codenames/releases)** e baixe
+   `codenames-host-debug.apk` (link direto:
+   `https://github.com/ViniHubb/codenames/releases/download/latest/codenames-host-debug.apk`).
+2. No Android, permita **instalar de fontes desconhecidas** (pedido na hora pelo navegador) e instale.
+3. **Só o celular Servidor (host) precisa do app**; os jogadores entram pelo navegador.
+
+> É um APK de **debug** (uso pessoal). Você também pode disparar um build manualmente em
+> **Actions → Build APK → Run workflow**.
+
 ## Pré-requisitos
 - **Android Studio** recente (Ladybug/2024.2 ou mais novo — também testado na linha 2026.x). O
   Android Studio **já inclui o JDK** necessário (JBR 17+), então não é preciso instalar Java à

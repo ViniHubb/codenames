@@ -1,0 +1,42 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build debug APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Preparar APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk codenames-host-debug.apk
+
+      - name: Publicar na release "latest"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create latest --prerelease \
+            --title "Codenames — build mais recente" \
+            --notes "APK de debug gerado automaticamente do último commit na main. Instale no celular Servidor (host); os jogadores entram pelo navegador." \
+            || true
+          gh release upload latest codenames-host-debug.apk --clobber
