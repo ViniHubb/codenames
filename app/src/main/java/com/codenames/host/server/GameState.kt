@@ -29,7 +29,7 @@ data class Card(
  * 1 assassin (9 + 8 + 7 + 1 = 25).
  */
 class GameEngine(
-    private val words: List<String>,
+    private var words: List<String>,
     private val rng: Random = Random.Default
 ) {
     var cards: List<Card> = emptyList()
@@ -50,9 +50,13 @@ class GameEngine(
         newGame()
     }
 
-    /** Deals a fresh board and resets turn/status. */
-    fun newGame() {
-        val chosen = words.distinct().shuffled(rng).take(BOARD_SIZE)
+    /** Deals a fresh board (optionally from a new word [pool]) and resets turn/status. */
+    fun newGame(pool: List<String> = words) {
+        words = pool
+        val chosen = pool.distinct().shuffled(rng).take(BOARD_SIZE)
+        require(chosen.size >= BOARD_SIZE) {
+            "Word pool must have at least $BOARD_SIZE distinct words (has ${chosen.size})."
+        }
         startingTeam = if (rng.nextBoolean()) Team.RED else Team.BLUE
         val colors = buildList {
             repeat(STARTING_TEAM_CARDS) { add(startingTeam.toColor()) }

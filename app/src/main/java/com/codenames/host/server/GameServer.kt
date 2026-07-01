@@ -36,7 +36,8 @@ class GameServer(
     private val assets: AssetManager,
     val port: Int = DEFAULT_PORT
 ) {
-    private val engine = GameEngine(WordBank.load(assets))
+    private val bank = WordBank.load(assets)
+    private val engine = GameEngine(bank.poolFor(GameMode.CLASSICO))
     private val job = SupervisorJob()
     private val scope = CoroutineScope(job + Dispatchers.IO)
     private val stateMutex = Mutex()
@@ -48,6 +49,9 @@ class GameServer(
 
     private val _playerCount = MutableStateFlow(0)
     val playerCount: StateFlow<Int> = _playerCount
+
+    private val _mode = MutableStateFlow(GameMode.CLASSICO)
+    val mode: StateFlow<GameMode> = _mode
 
     fun start() {
         if (server != null) return
@@ -70,10 +74,19 @@ class GameServer(
         job.cancel()
     }
 
-    /** Deals a fresh board and broadcasts to all clients. Safe to call from the UI thread. */
+    /** Deals a fresh board (current mode) and broadcasts. Safe to call from the UI thread. */
     fun newGame() {
         scope.launch {
-            stateMutex.withLock { engine.newGame() }
+            stateMutex.withLock { engine.newGame(bank.poolFor(_mode.value)) }
+            broadcast()
+        }
+    }
+
+    /** Switches the word theme and deals a fresh board. Host-only (called from the UI). */
+    fun setMode(mode: GameMode) {
+        scope.launch {
+            _mode.value = mode
+            stateMutex.withLock { engine.newGame(bank.poolFor(mode)) }
             broadcast()
         }
     }
@@ -94,7 +107,7 @@ class GameServer(
                     when (action.action) {
                         "reveal" -> action.index?.let { engine.reveal(it) }
                         "passTurn" -> engine.passTurn()
-                        "newGame" -> engine.newGame()
+                        "newGame" -> engine.newGame(bank.poolFor(_mode.value))
                     }
                 }
                 broadcast()

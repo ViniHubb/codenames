@@ -42,6 +42,9 @@ class ServerService : Service() {
         scope.launch {
             server.playerCount.collect { ServerState.playerCount.value = it }
         }
+        scope.launch {
+            server.mode.collect { ServerState.mode.value = it }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY

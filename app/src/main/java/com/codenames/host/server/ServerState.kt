@@ -10,6 +10,7 @@ object ServerState {
     val running = MutableStateFlow(false)
     val url = MutableStateFlow<String?>(null)
     val playerCount = MutableStateFlow(0)
+    val mode = MutableStateFlow(GameMode.CLASSICO)
 
     @Volatile
     var server: GameServer? = null

@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +33,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.codenames.host.server.GameMode
 import com.codenames.host.server.NetworkUtils
 import com.codenames.host.server.ServerState
 
@@ -50,6 +54,7 @@ fun StartScreen(onOpenBoard: () -> Unit) {
     val url by ServerState.url.collectAsStateWithLifecycle()
     val players by ServerState.playerCount.collectAsStateWithLifecycle()
     val running by ServerState.running.collectAsStateWithLifecycle()
+    val mode by ServerState.mode.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
@@ -106,7 +111,26 @@ fun StartScreen(onOpenBoard: () -> Unit) {
         Spacer(Modifier.height(24.dp))
         Text("Jogadores conectados: $players", style = MaterialTheme.typography.titleMedium)
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(24.dp))
+        Text(
+            "Modo",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(8.dp))
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            GameMode.entries.forEachIndexed { index, m ->
+                SegmentedButton(
+                    selected = mode == m,
+                    onClick = { ServerState.server?.setMode(m) },
+                    enabled = running,
+                    shape = SegmentedButtonDefaults.itemShape(index, GameMode.entries.size),
+                    icon = {}
+                ) { Text(m.label, maxLines = 1) }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
         Button(
             onClick = onOpenBoard,
             enabled = running,

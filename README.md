@@ -40,6 +40,8 @@ Detalhes de UX:
 - Jogadores no navegador têm um **botão de tela cheia** (entra em tela cheia automaticamente ao
   tocar em "Entrar"; no iOS use "Adicionar à Tela de Início").
 - Na tela inicial do host, **toque no IP para copiá-lo**.
+- A tela inicial do host tem um seletor de **Modo** (Clássico/Adjetivos/Verbos/Tudo); trocar o
+  modo re-sorteia o tabuleiro com o novo tema de palavras.
 - Cores do mapa: vermelho, azul, **cinza** (neutra) e preto (assassino).
 
 ## Pré-requisitos
@@ -110,21 +112,25 @@ app/src/main/
     server/
       GameState.kt               GameEngine: modelo, setup, revelar, vitória
       Snapshots.kt               DTOs + filtro por função (anti-trapaça)
-      WordBank.kt                Carrega o banco de palavras
+      GameMode.kt                Enum dos modos (Clássico/Adjetivos/Verbos/Tudo)
+      WordBank.kt                Carrega os bancos por tema + mistura do modo "Tudo"
       GameServer.kt              Ktor: estático + /ws + broadcast
       ServerService.kt           Foreground Service
       ServerState.kt             Ponte service ↔ UI (StateFlows)
       NetworkUtils.kt            IP local + bitmap do QR
   assets/
-    web/ index.html, app.js, style.css
-    words_ptbr.json              Banco de palavras PT-BR
+    web/ index.html, app.js, style.css, nosleep.min.js
+    words_substantivos.json      Banco por tema (substantivos — modo Clássico)
+    words_adjetivos.json         Banco por tema (adjetivos)
+    words_verbos.json            Banco por tema (verbos)
 ```
 
 ## Escopo do v1 e próximos passos
-Incluído: visões Mapa/Neutra, revelar no host com propagação em tempo real, detecção de
-vitória/assassino, contadores e indicador de turno, QR code + IP copiável, tabuleiro do host em
-tela cheia/paisagem, controles em linha única com ícones, tela cheia no navegador dos jogadores
-e reconexão automática do cliente.
+Incluído: visões Mapa/Neutra, revelar no host (toque longo, anti-misclick) com propagação em
+tempo real, detecção de vitória/assassino, contadores e indicador de turno, **modos de palavras
+por tema** (Clássico/Adjetivos/Verbos/Tudo) selecionados no host, QR code + IP copiável, tabuleiro
+do host em tela cheia/paisagem, controles em linha única com ícones, tela cheia no navegador dos
+jogadores, tela sempre acordada (host + jogadores) e reconexão automática do cliente.
 
-Fora do v1 (ideias futuras): timer por turno, efeitos sonoros/vibração, temas/listas
-customizadas de palavras, nomes de jogadores, múltiplos idiomas, persistir/restaurar sessão.
+Fora do v1 (ideias futuras): timer por turno, efeitos sonoros/vibração, listas de palavras
+customizadas pelo usuário, nomes de jogadores, múltiplos idiomas, persistir/restaurar sessão.
