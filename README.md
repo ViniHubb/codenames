@@ -74,9 +74,9 @@ Modos de cartas: Clássico / Picante / Tudo.
 ## Instalar sem PC (via Releases)
 A cada push na `main`, o GitHub Actions roda os testes, compila um **APK de debug** e o publica
 na release **latest**:
-1. Abra **[Releases](https://github.com/ViniHubb/codenames/releases)** e baixe
+1. Abra **[Releases](https://github.com/ViniHubb/resenha/releases)** e baixe
    `resenha-debug.apk` (link direto:
-   `https://github.com/ViniHubb/codenames/releases/download/latest/resenha-debug.apk`).
+   `https://github.com/ViniHubb/resenha/releases/download/latest/resenha-debug.apk`).
 2. No Android, permita **instalar de fontes desconhecidas** e instale.
 3. **Só o celular do mestre precisa do app**; os jogadores entram pelo navegador.
 
