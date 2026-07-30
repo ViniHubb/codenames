@@ -23,20 +23,23 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Build debug APK
+      - name: Rodar testes
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew testDebugUnitTest --no-daemon --stacktrace
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Preparar APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk codenames-host-debug.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk resenha-debug.apk
 
       - name: Publicar na release "latest"
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create latest --prerelease \
-            --title "Codenames — build mais recente" \
-            --notes "APK de debug gerado automaticamente do último commit na main. Instale no celular Servidor (host); os jogadores entram pelo navegador." \
+            --title "Resenha — build mais recente" \
+            --notes "APK de debug gerado automaticamente do último commit na main. Instale no celular que vai ser o mestre; os jogadores entram pelo navegador." \
             || true
-          gh release upload latest codenames-host-debug.apk --clobber
+          gh release upload latest resenha-debug.apk --clobber

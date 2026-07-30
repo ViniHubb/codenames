@@ -1,0 +1,174 @@
+/* Shared palette and chrome for every Resenha game client. */
+:root {
+    --bg: #1a1b26;
+    --panel: #24263a;
+    --text: #e6e7ee;
+    --text-dim: #9aa0b5;
+    --muted: #9aa0b5;
+    --red: #c0392b;
+    --dark-red: #8e1f1a;
+    --red-dim: #5e2722;
+    --blue: #2471a3;
+    --dark-blue: #1a4d6e;
+    --blue-dim: #1d3a4f;
+    --neutral: #c9ccd6;
+    --dark-neutral: #7a7e8c;
+    --neutral-dim: #4a4d59;
+    --accent: #4c5fd5;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.hidden { display: none !important; }
+
+/* ---------- Landing ---------- */
+.landing {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    gap: 18px;
+    text-align: center;
+}
+.landing h1 { margin: 0; font-size: 2.4rem; letter-spacing: 2px; }
+.subtitle { margin: 0; color: var(--muted); }
+.group { width: 100%; max-width: 420px; }
+.group-label { display: block; color: var(--muted); margin-bottom: 8px; font-size: .9rem; }
+.options { display: flex; gap: 12px; }
+.opt {
+    flex: 1;
+    padding: 16px;
+    font-size: 1rem;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background: var(--panel);
+    color: var(--text);
+    cursor: pointer;
+}
+.opt.selected { border-color: var(--text); transform: scale(1.02); }
+.opt.team-red.selected { background: var(--red); }
+.opt.team-blue.selected { background: var(--blue); }
+.opt:disabled { opacity: .45; cursor: not-allowed; }
+.enter {
+    width: 100%;
+    max-width: 420px;
+    padding: 18px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+}
+.enter:disabled { opacity: .4; cursor: not-allowed; }
+.hint { color: var(--muted); font-size: .8rem; max-width: 420px; }
+
+/* ---------- Game chrome ---------- */
+.game {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    gap: 5px;
+}
+/* Single compact bar holding everything outside the play area. */
+#topbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+}
+.spacer { flex: 1 1 auto; }
+.banner {
+    flex: none;
+    width: 170px; /* fixed so it doesn't resize when the turn switches red <-> blue */
+    height: 40px;
+    line-height: 40px;
+    font-weight: 600;
+    font-size: .82rem;
+    padding: 0 12px;
+    border-radius: 8px;
+    background: var(--panel);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.banner.turn-red { background: var(--red); }
+.banner.turn-blue { background: var(--blue); }
+.banner.win-red { background: var(--red); }
+.banner.win-blue { background: var(--blue); }
+.banner.conn-error { background: var(--neutral-dim); }
+.count {
+    height: 40px;
+    line-height: 40px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 0 12px;
+    border-radius: 8px;
+    min-width: 34px;
+    text-align: center;
+}
+.count.red { background: var(--red); }
+.count.blue { background: var(--blue); }
+
+/* Standardized compact square buttons (host only). */
+.host-controls { display: flex; gap: 6px; }
+.ctrl {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.ctrl:active { transform: scale(0.94); }
+.ctrl svg {
+    display: block; /* removes baseline gap so the icon is perfectly centered */
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ---------- Fullscreen toggle (floating) ---------- */
+.fs-btn {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(76, 95, 213, 0.85);
+    color: #fff;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 50;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.fs-btn:active { transform: scale(0.94); }

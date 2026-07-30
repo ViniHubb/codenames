@@ -1,0 +1,83 @@
+/* Codenames-specific board styling. Shared chrome lives in /shared/base.css. */
+:root {
+    --card: #2f3350;
+    --assassin: #15151c;
+    --hold-ms: 2000ms; /* how long the host holds a card to reveal it (kept in sync by app.js) */
+}
+
+/* Board: 5 columns, fills available space */
+.board {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 6px;
+    min-height: 0;
+}
+.card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2px 5px;
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--text);
+    font-weight: 700;
+    font-size: clamp(0.7rem, 2.7vw, 1.45rem);
+    text-transform: uppercase;
+    line-height: 1.05;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    user-select: none;
+    border: 2px solid transparent;
+    overflow: hidden;
+    position: relative;
+    -webkit-touch-callout: none;
+}
+.word {
+    position: relative;
+    z-index: 1;
+}
+/* Long-press feedback: a translucent sweep fills the card while it is held. */
+.fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: rgba(255, 255, 255, 0.32);
+    border-radius: inherit;
+    pointer-events: none;
+    transition: width 150ms ease; /* quick reset when released early */
+}
+.card.holding .fill {
+    width: 100%;
+    transition: width var(--hold-ms) linear; /* fills over the hold duration */
+}
+/* Vibrant tiles. In the MAP view (host/spymaster) these style the UNREVEALED cards — the ones
+   that still matter. In the AGENT view they style the revealed cards (the only colored ones). */
+.card.red,
+.agent-view .card.revealed.red { background: var(--red); border-color: var(--dark-red); color: var(--bg); }
+.card.blue,
+.agent-view .card.revealed.blue { background: var(--blue); border-color: var(--dark-blue); color: var(--bg); }
+.card.neutral,
+.agent-view .card.revealed.neutral { background: var(--neutral); border-color: var(--dark-neutral); color: var(--bg); }
+.card.assassin,
+.agent-view .card.revealed.assassin { background: #000; border-color: #ff5a4d; color: #ff5a4d; }
+
+/* Agent view: a revealed card lifts to stand out from the blank tiles. */
+.agent-view .card.revealed {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12), 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Map view: once a card is marked it matters less, so it recedes to a soft, muted tint. */
+.map-view .card.revealed.red { background: #4a302e; border-color: #6f433c; color: var(--text-dim); }
+.map-view .card.revealed.blue { background: #26384a; border-color: #3b5f7e; color: var(--text-dim); }
+.map-view .card.revealed.neutral { background: #474b58; border-color: #7a8090; color: var(--text-dim); }
+.map-view .card.revealed.assassin { background: #1d1d25; border-color: #45454e; color: #e0554c; }
+
+/* Host-only: unrevealed cards are tappable (long-press). touch-action:none keeps the press
+   stable (no scroll/zoom interfering with the hold). */
+.card.tappable { cursor: pointer; touch-action: none; }
+.card.tappable:active { transform: scale(0.97); }
