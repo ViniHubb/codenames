@@ -1,0 +1,181 @@
+/* Sintonia-specific dial styling. Shared chrome lives in /shared/base.css. */
+:root {
+    --dial-h: 74px;
+    --band-4: #f2c14e;
+    --band-3: #a6c36f;
+    --band-2: #4f8a8b;
+}
+
+.round {
+    color: var(--muted);
+    font-size: .8rem;
+    white-space: nowrap;
+}
+
+/* ---------- Stage: labels + dial + clue ---------- */
+.stage {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 18px; /* clears the needle head, which overhangs the bar by 16px */
+    padding: 4px 14px;
+}
+
+.ends {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    font-weight: 700;
+    font-size: clamp(0.85rem, 3.2vw, 1.5rem);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+.end { max-width: 45%; line-height: 1.1; }
+.end.left { text-align: left; }
+.end.right { text-align: right; }
+
+/* The 0..100 axis. Deliberately not clipping: `overflow: hidden` here ate the needle at 0% and
+   100%, where it overhangs on purpose. The target clips itself instead. */
+.dial {
+    position: relative;
+    height: var(--dial-h);
+    border: 4px solid rgba(255, 255, 255, .22);
+    border-radius: 4px;
+    background: linear-gradient(90deg, #2a2d44 0%, #3a3f61 50%, #565d8a 100%);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, .45);
+    touch-action: none; /* dragging the needle must not scroll or zoom the page */
+}
+
+/* Scoring bands around the hidden target. Safe to clip: the needle is a sibling, not a child. */
+.target {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.target .band { display: block; height: 100%; }
+.target .band.p4 { background: var(--band-4); }
+.target .band.p3 { background: var(--band-3); }
+.target .band.p2 { background: var(--band-2); }
+/* On reveal the target fades in rather than popping, so the table sees it land. */
+.target.revealing { animation: target-in 420ms ease-out; }
+@keyframes target-in {
+    from { opacity: 0; transform: scaleY(.4); }
+    to { opacity: 1; transform: scaleY(1); }
+}
+
+/* Middle of the spectrum. Same coordinate space as the needle, so at 50 it lines up exactly. */
+.center-mark {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    background: rgba(255, 255, 255, .38);
+    pointer-events: none;
+}
+
+.needle {
+    position: absolute;
+    top: -9px; /* the line pokes out above the bar so the head can cap it */
+    bottom: -4px;
+    width: 4px;
+    margin-left: -2px;
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+    transition: left 90ms linear;
+}
+/* Head centred on the top end of the line, like a pin. */
+.needle-head {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+}
+/* While the master drags, drop the easing so the needle tracks the finger exactly. */
+.dial.dragging .needle { transition: none; }
+.dial.draggable { cursor: grab; }
+
+.clue {
+    margin: 0;
+    text-align: center;
+    font-size: clamp(1rem, 4vw, 1.8rem);
+    font-weight: 700;
+    min-height: 1.4em;
+}
+.clue:empty::before { content: "—"; color: var(--muted); }
+
+/* Round result, shown to everyone on the reveal. */
+.result {
+    margin: 0;
+    text-align: center;
+    font-size: clamp(.9rem, 3vw, 1.2rem);
+    font-weight: 600;
+    color: var(--muted);
+}
+.result .pts-red { color: var(--red); }
+.result .pts-blue { color: var(--blue); }
+
+/* ---------- Phase controls (master only) ---------- */
+.controls { padding: 4px 14px 10px; }
+.phase {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.phase-hint { color: var(--muted); font-size: .9rem; }
+.clue-input {
+    flex: 0 1 240px; /* doesn't grow: a clue is a word or two, not a sentence */
+    max-width: 240px;
+    padding: 9px 12px;
+    font-size: 1rem;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: var(--panel);
+    color: var(--text);
+}
+.clue-input:focus { outline: none; border-color: var(--accent); }
+.action {
+    padding: 12px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.action:active { transform: scale(0.96); }
+.action:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Step buttons for the pointer — dragging a thin bar is fiddly, especially in landscape. */
+.nudge {
+    width: 64px;
+    height: 46px;
+    font-size: 1.15rem;
+    line-height: 1;
+    border: none;
+    border-radius: 10px;
+    background: var(--panel);
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+    touch-action: none; /* holding to repeat must not scroll the page */
+    -webkit-touch-callout: none;
+}
+.nudge:active { background: var(--accent); transform: scale(0.96); }

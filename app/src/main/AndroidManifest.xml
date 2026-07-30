@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Codenames"
+        android:theme="@style/Theme.Resenha"
         android:usesCleartextTraffic="true">
 
         <activity
@@ -36,7 +36,7 @@
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Hospeda o servidor local do jogo Codenames na rede Wi-Fi para os jogadores conectarem pelo navegador." />
+                android:value="Hospeda o servidor local dos jogos do Resenha na rede Wi-Fi para os jogadores conectarem pelo navegador." />
         </service>
 
     </application>

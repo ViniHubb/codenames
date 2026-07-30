@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="theme-color" content="#1A1B26" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Sintonia — Resenha</title>
+    <link rel="stylesheet" href="/shared/base.css" />
+    <link rel="stylesheet" href="/sintonia/style.css" />
+</head>
+<body>
+    <section id="game" class="game">
+        <header id="topbar">
+            <button id="backBtn" class="ctrl hidden" type="button" title="Voltar" aria-label="Voltar">
+                <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </button>
+            <div id="banner" class="banner"></div>
+            <span class="count red"><span id="scoreRed">0</span></span>
+            <span class="count blue"><span id="scoreBlue">0</span></span>
+            <span id="roundLabel" class="round"></span>
+            <span class="spacer"></span>
+            <div id="hostControls" class="host-controls hidden">
+                <button id="newGame" class="ctrl" type="button" title="Nova partida" aria-label="Nova partida">
+                    <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- The spectrum: two opposite concepts with the hidden target somewhere between them. -->
+        <div class="stage">
+            <div class="ends">
+                <span id="leftLabel" class="end left"></span>
+                <span id="rightLabel" class="end right"></span>
+            </div>
+
+            <div id="dial" class="dial">
+                <div id="target" class="target hidden"></div>
+                <!-- After the target so it reads over the bands, before the needle so 50 isn't drawn twice. -->
+                <span class="center-mark" aria-hidden="true"></span>
+                <div id="needle" class="needle"><span class="needle-head"></span></div>
+            </div>
+
+            <p id="clue" class="clue"></p>
+            <p id="result" class="result hidden"></p>
+        </div>
+
+        <!-- Phase controls. Only the master gets any of these; everyone else just watches. -->
+        <div id="controls" class="controls hidden">
+            <div id="cluePhase" class="phase hidden">
+                <input id="clueInput" class="clue-input" type="text" maxlength="60"
+                       placeholder="Dica" autocomplete="off" />
+                <button id="sendClue" class="action" type="button">Enviar dica</button>
+            </div>
+
+            <div id="guessPhase" class="phase hidden">
+                <button id="nudgeLeft" class="nudge" type="button" aria-label="Mover o ponteiro para a esquerda">◀</button>
+                <button id="nudgeRight" class="nudge" type="button" aria-label="Mover o ponteiro para a direita">▶</button>
+                <button id="lockGuess" class="action" type="button">Travar palpite</button>
+            </div>
+
+            <div id="betPhase" class="phase hidden">
+                <button id="betLeft" class="action" type="button"></button>
+                <button id="betRight" class="action" type="button"></button>
+            </div>
+
+            <div id="revealPhase" class="phase hidden">
+                <span id="revealText" class="phase-hint"></span>
+                <button id="nextRound" class="action" type="button">Próxima rodada</button>
+            </div>
+        </div>
+    </section>
+
+    <button id="fsBtn" class="fs-btn" type="button" title="Tela cheia" aria-label="Tela cheia">⛶</button>
+
+    <script src="/shared/nosleep.min.js"></script>
+    <script src="/shared/common.js"></script>
+    <script src="/sintonia/app.js"></script>
+</body>
+</html>
